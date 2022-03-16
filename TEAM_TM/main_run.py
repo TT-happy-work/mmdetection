@@ -15,7 +15,6 @@ import os
 
 ## Organization
 print('Is cuda available:', torch.cuda.is_available())
-
 arch = 'faster'   # 'faster' /  'yolo'
 if arch=='faster':
     cfg_file = '/home/tamarbo/PycharmProjects/mmdetection/TEAM_TM/configs/faster_carDamage_config.py'
