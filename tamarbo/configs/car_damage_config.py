@@ -12,9 +12,10 @@ model = dict(
         norm_cfg=dict(type='BN', requires_grad=False),
         norm_eval=True,
         style='caffe',
-        init_cfg=dict(
-            type='Pretrained',
-            checkpoint='open-mmlab://detectron2/resnet50_caffe')),
+        #init_cfg=dict(
+            #type='Pretrained',
+            #checkpoint='open-mmlab://detectron2/resnet50_caffe')
+        ),
     neck=dict(
         type='FPN',
         in_channels=[256, 512, 1024, 2048],
@@ -103,7 +104,7 @@ model = dict(
             nms=dict(type='nms', iou_threshold=0.7),
             min_bbox_size=0),
         rcnn=dict(
-            score_thr=0.05,
+            score_thr=0.30,
             nms=dict(type='nms', iou_threshold=0.5),
             max_per_img=100)))
 dataset_type = 'CocoDataset'
@@ -176,7 +177,7 @@ data = dict(
             dict(type='DefaultFormatBundle'),
             dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels'])
         ],
-        data_root='/home/tamarbo/datasets/CarDamage_OD/'),
+        data_root='/home/tamarbo/datasets/car_damage/'),
     val=dict(
         type='CocoDataset',
         ann_file='val/COCO_mul_val_annos.json',
@@ -201,7 +202,7 @@ data = dict(
                     dict(type='Collect', keys=['img'])
                 ])
         ],
-        data_root='/home/tamarbo/datasets/CarDamage_OD/'),
+        data_root='/home/tamarbo/datasets/car_damage/'),
     test=dict(
         type='CocoDataset',
         ann_file='val/COCO_mul_val_annos.json',
@@ -226,7 +227,7 @@ data = dict(
                     dict(type='Collect', keys=['img'])
                 ])
         ],
-        data_root='/home/tamarbo/datasets/CarDamage_OD/'))
+        data_root='/home/tamarbo/datasets/car_damage/'))
 #evaluation = dict(interval=12, metric='mAP')
 optimizer = dict(type='SGD', lr=0.0025, momentum=0.9, weight_decay=0.0001)
 optimizer_config = dict(grad_clip=None)
@@ -239,18 +240,32 @@ lr_config = dict(
 runner = dict(type='EpochBasedRunner', max_epochs=5)
 checkpoint_config = dict(interval=12)
 log_config = dict(interval=10, hooks=[dict(type='TextLoggerHook')])
-custom_hooks = [dict(type='NumClassCheckHook')]
+
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-load_from = '../tamarbo/checkpoint/mask_rcnn_r50_caffe_fpn_mstrain-poly_3x_coco_bbox_mAP-0.408__segm_mAP-0.37_20200504_163245-42aa3d00.pth'#faster_rcnn_r50_fpn_1x_coco_20200130-047c8118.pth'
-resume_from = None
+resume_from = '../../tamarbo/checkpoint/mask_rcnn_r50_caffe_fpn_mstrain-poly_3x_coco_bbox_mAP-0.408__segm_mAP-0.37_20200504_163245-42aa3d00.pth'
+
 workflow = [('train', 1)]
 work_dir = '/home/tamarbo/PycharmProjects/mmdetHack/Runs/try1'
 seed = 0
 gpu_ids = range(0, 1)
+deterministic = True
+no_validate = False
+
+# show Filters hook parameters
+show_filters_dir = work_dir + '/show_filters'
+
+show_filters_hook = dict(
+    type='ShowFiltersHook',
+    work_dir=work_dir,
+    cfg_path='./car_damage_config.py',
+    which_layers=[0, 30],
+    results_dir_name='show_filters_dir')
+
+custom_hooks = [dict(type='NumClassCheckHook')] #show_filters_hook]
 
 # custom_imports=dict(
-#     imports=['mmdetection.tamarbo.kitti_Dataset'])
+#      imports=['mmdetection.tamarbo.kitti_Dataset'])
 
 example_images = ['/home/tamarbo/datasets/car_damage/val/1.jpg',
                   '/home/tamarbo/datasets/car_damage/val/22.jpg',
