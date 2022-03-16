@@ -16,9 +16,13 @@ import os
 ## Organization
 print('Is cuda available:', torch.cuda.is_available())
 
-#cfg_file = 'configs/kiti_config.py'
-cfg_file = '/home/tamarbo/PycharmProjects/mmdetection/TEAM_TM/configs/faster_carDamage_config.py'
-#cfg_file = '/home/tamarbo/PycharmProjects/mmdetection/TEAM_TM/configs/yolo3_carDamage_config.py'
+arch = 'faster'   # 'faster' /  'yolo'
+if arch=='faster':
+    cfg_file = '/home/tamarbo/PycharmProjects/mmdetection/TEAM_TM/configs/faster_carDamage_config.py'
+elif arch=='yolo':
+    cfg_file = '/home/tamarbo/PycharmProjects/mmdetection/TEAM_TM/configs/yolo3_carDamage_config.py'
+elif arch=='detr':
+    cfg_file = '/home/tamarbo/PycharmProjects/mmdetection/TEAM_TM/configs/yolo3_carDamage_config.py'
 
 cfg = Config.fromfile(cfg_file)
 
@@ -69,8 +73,11 @@ model = build_detector(
     cfg.model,
     train_cfg=cfg.get('train_cfg'),
     test_cfg=cfg.get('test_cfg'))
-# Call ShowFiltersHook
 
+# Call Hook: EasyAssignment#8
+
+
+# Call ShowFiltersHook
 model.init_weights()
 # Call ShowFiltersHook
 

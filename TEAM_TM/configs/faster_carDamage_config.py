@@ -1,3 +1,4 @@
+this_cfg_name = 'faster_carDamage_config'
 num_classes = 5
 CLASSES = ['headlamp', 'rear_bumper', 'door', 'hood', 'front_bumper']
 
@@ -228,7 +229,7 @@ data = dict(
                 ])
         ],
         data_root='/home/tamarbo/datasets/car_damage/'))
-#evaluation = dict(interval=12, metric='mAP')
+evaluation = dict(interval=1, metric=['mAP', 'bbox'])
 optimizer = dict(type='SGD', lr=0.0025, momentum=0.9, weight_decay=0.0001)
 optimizer_config = dict(grad_clip=None)
 lr_config = dict(
@@ -243,7 +244,7 @@ log_config = dict(interval=10, hooks=[dict(type='TextLoggerHook')])
 
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-resume_from = '../../tamarbo/checkpoint/mask_rcnn_r50_caffe_fpn_mstrain-poly_3x_coco_bbox_mAP-0.408__segm_mAP-0.37_20200504_163245-42aa3d00.pth'
+resume_from = '../TEAM_TM/checkpoint/faster_rcnn_r50_fpn_1x_coco_20200130-047c8118.pth'
 
 workflow = [('train', 1)]
 work_dir = '/home/tamarbo/PycharmProjects/mmdetHack/Runs/try1'
@@ -258,14 +259,24 @@ show_filters_dir = work_dir + '/show_filters'
 show_filters_hook = dict(
     type='ShowFiltersHook',
     work_dir=work_dir,
-    cfg_path='./car_damage_config.py',
+    cfg_path=this_cfg_name,
     which_layers=[0, 30],
     results_dir_name='show_filters_dir')
 
-custom_hooks = [dict(type='NumClassCheckHook')] #show_filters_hook]
+replace_layer_hook = dict(
+    type='ReplaceFiltersHook',
+    work_dir=work_dir,
+    cfg_path=this_cfg_name,
+    which_layer_name = 'conv1',
+    new_layers_amount=2,
+    new_layers_filter_size=(3,3),
+    results_dir_name='replace_layer_dir')
+
+
+custom_hooks = [dict(type='NumClassCheckHook'), replace_layer_hook] #show_filters_hook]
 
 # custom_imports=dict(
-#      imports=['mmdetection.tamarbo.kitti_Dataset'])
+#      imports=['mmdetection.TEAM_TM.kitti_Dataset'])
 
 example_images = ['/home/tamarbo/datasets/car_damage/val/1.jpg',
                   '/home/tamarbo/datasets/car_damage/val/22.jpg',
