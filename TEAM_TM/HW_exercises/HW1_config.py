@@ -1,4 +1,6 @@
-this_cfg_name = 'faster_carDamage_config'
+this_cfg_name = 'HW1_config'
+work_dir = '/home/tamarbo/PycharmProjects/mmdetHack/Runs/HW1'
+
 num_classes = 5
 CLASSES = ['headlamp', 'rear_bumper', 'door', 'hood', 'front_bumper']
 
@@ -245,10 +247,9 @@ log_config = dict(interval=10, hooks=[dict(type='TextLoggerHook')])
 
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-resume_from = '/home/tamarbo/PycharmProjects/mmdetection/TEAM_TM/checkpoint/faster_rcnn_r50_fpn_1x_coco_20200130-047c8118.pth'
+resume_from = '/home/tamarbo/PycharmProjects/mmdetection/TEAM_TM/checkpoint/faster_rcnn_r50_fpn_mstrain_3x_coco_20210524_110822-e10bd31c.pth'
 
 workflow = [('train', 1)]
-work_dir = '/home/tamarbo/PycharmProjects/mmdetHack/Runs/try1'
 seed = 0
 gpu_ids = range(0, 1)
 deterministic = True

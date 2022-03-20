@@ -1,6 +1,8 @@
-this_cfg_name = 'faster_carDamage_config'
-num_classes = 5
-CLASSES = ['headlamp', 'rear_bumper', 'door', 'hood', 'front_bumper']
+this_cfg_name = 'config_faster_coco'
+work_dir = '/home/tamarbo/PycharmProjects/mmdetHack/Runs/Quick5'
+
+# num_classes = 5
+# CLASSES = ['headlamp', 'rear_bumper', 'door', 'hood', 'front_bumper']
 
 model = dict(
     type='FasterRCNN',
@@ -109,28 +111,23 @@ model = dict(
         # soft-nms is also supported for rcnn testing
         # e.g., nms=dict(type='soft_nms', iou_threshold=0.5, min_score=0.05)
     ))
+
+# dataset settings
 dataset_type = 'CocoDataset'
-data_root = 'car_damage/'
+data_root = 'coco/'
 img_norm_cfg = dict(
-    mean=[103.53, 116.28, 123.675], std=[1.0, 1.0, 1.0], to_rgb=False)
+    mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
+
+
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations', with_bbox=True),
-    dict(
-        type='Resize',
-        img_scale=[(1333, 640), (1333, 672), (1333, 704), (1333, 736),
-                   (1333, 768), (1333, 800)],
-        multiscale_mode='value',
-        keep_ratio=True),
+    dict(type='Resize', img_scale=(1333, 800), keep_ratio=True),
     dict(type='RandomFlip', flip_ratio=0.5),
-    dict(
-        type='Normalize',
-        mean=[103.53, 116.28, 123.675],
-        std=[1.0, 1.0, 1.0],
-        to_rgb=False),
+    dict(type='Normalize', **img_norm_cfg),
     dict(type='Pad', size_divisor=32),
     dict(type='DefaultFormatBundle'),
-    dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels'])
+    dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels']),
 ]
 test_pipeline = [
     dict(type='LoadImageFromFile'),
@@ -141,95 +138,31 @@ test_pipeline = [
         transforms=[
             dict(type='Resize', keep_ratio=True),
             dict(type='RandomFlip'),
-            dict(
-                type='Normalize',
-                mean=[103.53, 116.28, 123.675],
-                std=[1.0, 1.0, 1.0],
-                to_rgb=False),
+            dict(type='Normalize', **img_norm_cfg),
             dict(type='Pad', size_divisor=32),
             dict(type='ImageToTensor', keys=['img']),
-            dict(type='Collect', keys=['img'])
+            dict(type='Collect', keys=['img']),
         ])
 ]
-
 data = dict(
-    samples_per_gpu=1,
-    workers_per_gpu=0,
+    samples_per_gpu=2,
+    workers_per_gpu=2,
     train=dict(
-        type='CocoDataset',
-        ann_file='train/COCO_mul_train_annos.json',
-        img_prefix='train/',
-        classes = CLASSES,
-        pipeline=[
-            dict(type='LoadImageFromFile'),
-            dict(type='LoadAnnotations', with_bbox=True),
-            dict(
-                type='Resize',
-                img_scale=[(1333, 640), (1333, 672), (1333, 704), (1333, 736),
-                           (1333, 768), (1333, 800)],
-                multiscale_mode='value',
-                keep_ratio=True),
-            dict(type='RandomFlip', flip_ratio=0.5),
-            dict(
-                type='Normalize',
-                mean=[103.53, 116.28, 123.675],
-                std=[1.0, 1.0, 1.0],
-                to_rgb=False),
-            dict(type='Pad', size_divisor=32),
-            dict(type='DefaultFormatBundle'),
-            dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels'])
-        ],
-        data_root='/home/tamarbo/datasets/car_damage/'),
+        type=dataset_type,
+        ann_file=data_root + 'annotations/instances_train2017.json',
+        img_prefix=data_root + 'train2017/',
+        pipeline=train_pipeline),
     val=dict(
-        type='CocoDataset',
-        ann_file='val/COCO_mul_val_annos.json',
-        img_prefix='val/',
-        classes = CLASSES,
-        pipeline=[
-            dict(type='LoadImageFromFile'),
-            dict(
-                type='MultiScaleFlipAug',
-                img_scale=(1333, 800),
-                flip=False,
-                transforms=[
-                    dict(type='Resize', keep_ratio=True),
-                    dict(type='RandomFlip'),
-                    dict(
-                        type='Normalize',
-                        mean=[103.53, 116.28, 123.675],
-                        std=[1.0, 1.0, 1.0],
-                        to_rgb=False),
-                    dict(type='Pad', size_divisor=32),
-                    dict(type='ImageToTensor', keys=['img']),
-                    dict(type='Collect', keys=['img'])
-                ])
-        ],
-        data_root='/home/tamarbo/datasets/car_damage/'),
+        type=dataset_type,
+        ann_file=data_root + 'annotations/instances_val2017.json',
+        img_prefix=data_root + 'val2017/',
+        pipeline=test_pipeline),
     test=dict(
-        type='CocoDataset',
-        ann_file='val/COCO_mul_val_annos.json',
-        img_prefix='val/',
-        classes = CLASSES,
-        pipeline=[
-            dict(type='LoadImageFromFile'),
-            dict(
-                type='MultiScaleFlipAug',
-                img_scale=(1333, 800),
-                flip=False,
-                transforms=[
-                    dict(type='Resize', keep_ratio=True),
-                    dict(type='RandomFlip'),
-                    dict(
-                        type='Normalize',
-                        mean=[103.53, 116.28, 123.675],
-                        std=[1.0, 1.0, 1.0],
-                        to_rgb=False),
-                    dict(type='Pad', size_divisor=32),
-                    dict(type='ImageToTensor', keys=['img']),
-                    dict(type='Collect', keys=['img'])
-                ])
-        ],
-        data_root='/home/tamarbo/datasets/car_damage/'))
+        type=dataset_type,
+        ann_file=data_root + 'annotations/instances_val2017.json',
+        img_prefix=data_root + 'val2017/',
+        pipeline=test_pipeline))
+
 evaluation = dict(interval=1, metric=['mAP', 'bbox'])
 optimizer = dict(type='SGD', lr=0.0025, momentum=0.9, weight_decay=0.0001)
 optimizer_config = dict(grad_clip=None)
@@ -245,10 +178,9 @@ log_config = dict(interval=10, hooks=[dict(type='TextLoggerHook')])
 
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-resume_from = '/home/tamarbo/PycharmProjects/mmdetection/TEAM_TM/checkpoint/faster_rcnn_r50_fpn_1x_coco_20200130-047c8118.pth'
+resume_from = '/home/tamarbo/PycharmProjects/mmdetection/TEAM_TM/checkpoint/faster_rcnn_r50_fpn_mstrain_3x_coco_20210524_110822-e10bd31c.pth'
 
 workflow = [('train', 1)]
-work_dir = '/home/tamarbo/PycharmProjects/mmdetHack/Runs/try1'
 seed = 0
 gpu_ids = range(0, 1)
 deterministic = True
@@ -275,12 +207,8 @@ replace_layer_hook = dict(
 
 
 custom_hooks = [dict(type='NumClassCheckHook')]#, replace_layer_hook] #show_filters_hook]
-#custom_imports = dict(imports='/TEAM_TM/hooks/ReplaceLayerHook.py', allow_failed_imports=False)
+#custom_imports = dict(imports=['mmdetection.TEAM_TM.hooks.ReplaceLayerHook'])
 
 
 # custom_imports=dict(
 #      imports=['mmdetection.TEAM_TM.kitti_Dataset'])
-
-example_images = ['/home/tamarbo/datasets/car_damage/val/1.jpg',
-                  '/home/tamarbo/datasets/car_damage/val/22.jpg',
-                  '/home/tamarbo/datasets/car_damage/val/3.jpg']
