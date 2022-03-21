@@ -32,7 +32,7 @@ archs = {
 for arch in archs.keys():
     print(arch)
     cfg = Config.fromfile(archs[arch])
-    sys.argv.append(cfg_file_path)
+    sys.argv.append(cfg)
     model = init_detector(cfg, cfg.resume_from, device='cuda:0')
     # plt.imshow(plt.imread(demo_img_path))
     # plt.show()
