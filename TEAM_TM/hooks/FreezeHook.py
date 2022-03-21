@@ -11,7 +11,7 @@ class FreezeHook(Hook):
 
     def before_train_iter(self,runner):
 
-        if runner.print_model==True:
+        if self.print_model==True:
             print(runner.model.module)
 
         if self.freeze_layers!=['']:
