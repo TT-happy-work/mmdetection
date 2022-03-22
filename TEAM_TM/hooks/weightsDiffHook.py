@@ -1,12 +1,12 @@
 from mmcv.runner import Hooks, Hook
 import torch
-from  datetime import datetime
+from datetime import datetime
 import numpy as np
 from numpy import linalg as LA
 
 
 @HOOKS.register_module()
-class ShowweightsDiffHook(Hook):
+class ShowWeightsDiffHook(Hook):
 
     def __init__(self,cfg_path='' , show_weights_from_layers=['']  , print_model=False):
 
